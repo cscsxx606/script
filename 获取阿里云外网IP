@@ -1,0 +1,32 @@
+from aliyunsdkcore import  client
+import configparser
+import json
+import  os
+from  aliyunsdkecs.request.v20140526  import DescribeRegionsRequest
+from aliyunsdkecs.request.v20140526 import  DescribeInstancesRequest
+
+cp=configparser.ConfigParser()
+cp.read('aliyun.conf')
+access_id=cp.get('Access','access_key_id')
+access_key=cp.get('Access','access_key_secret')
+clt=client.AcsClient(access_id,access_key,"cn-beijing")
+iplist=open('iplist.txt','w')
+for  pages  in range(1,10):
+    request=DescribeInstancesRequest.DescribeInstancesRequest()
+    request.set_accept_format('json')
+    request.set_PageNumber(pages)
+    request.set_PageSize(100)
+    result=clt.do_action_with_exception(request)
+    pip=json.loads(result)
+    publicip=pip['Instances']['Instance']
+    for i in publicip:
+        p=i['PublicIpAddress']['IpAddress']
+        for z in  p:
+            iplist.write(z+'\n')
+iplist.close()
+D=1
+scanip=open('iplist.txt','r').read()
+for  i in  scanip:
+    D=D+1
+    print (scanip)
+print (D)
